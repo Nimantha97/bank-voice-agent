@@ -1,0 +1,71 @@
+{
+  "customers": [
+    {
+      "customer_id": "CUST001",
+      "pin": "1234",
+      "name": "John Doe",
+      "email": "john.doe@email.com",
+      "phone": "+1-555-0101",
+      "address": "999 New Street, Boston, MA 02101",
+      "account_number": "ACC001",
+      "account_balance": 15420.5,
+      "account_type": "Savings",
+      "cards": [
+        {
+          "card_id": "CARD001",
+          "card_number": "**** **** **** 1234",
+          "card_type": "Credit",
+          "status": "blocked",
+          "credit_limit": 5000.0,
+          "available_credit": 3200.0
+        },
+        {
+          "card_id": "CARD002",
+          "card_number": "**** **** **** 5678",
+          "card_type": "Debit",
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "customer_id": "CUST002",
+      "pin": "5678",
+      "name": "Jane Smith",
+      "email": "jane.smith@email.com",
+      "phone": "+1-555-0102",
+      "address": "456 Oak Ave, Los Angeles, CA 90001",
+      "account_number": "ACC002",
+      "account_balance": 8750.25,
+      "account_type": "Checking",
+      "cards": [
+        {
+          "card_id": "CARD003",
+          "card_number": "**** **** **** 9012",
+          "card_type": "Credit",
+          "status": "active",
+          "credit_limit": 10000.0,
+          "available_credit": 8500.0
+        }
+      ]
+    },
+    {
+      "customer_id": "CUST003",
+      "pin": "9999",
+      "name": "Bob Johnson",
+      "email": "bob.johnson@email.com",
+      "phone": "+1-555-0103",
+      "address": "789 Pine Rd, Chicago, IL 60601",
+      "account_number": "ACC003",
+      "account_balance": 25600.0,
+      "account_type": "Savings",
+      "cards": [
+        {
+          "card_id": "CARD004",
+          "card_number": "**** **** **** 3456",
+          "card_type": "Debit",
+          "status": "active"
+        }
+      ]
+    }
+  ]
+}

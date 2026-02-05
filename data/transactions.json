@@ -1,0 +1,90 @@
+{
+  "transactions": {
+    "CUST001": [
+      {
+        "transaction_id": "TXN001",
+        "date": "2024-01-15",
+        "description": "Amazon Purchase",
+        "amount": -89.99,
+        "type": "debit",
+        "category": "Shopping"
+      },
+      {
+        "transaction_id": "TXN002",
+        "date": "2024-01-14",
+        "description": "Salary Deposit",
+        "amount": 3500.00,
+        "type": "credit",
+        "category": "Income"
+      },
+      {
+        "transaction_id": "TXN003",
+        "date": "2024-01-13",
+        "description": "Grocery Store",
+        "amount": -125.50,
+        "type": "debit",
+        "category": "Groceries"
+      },
+      {
+        "transaction_id": "TXN004",
+        "date": "2024-01-12",
+        "description": "Gas Station",
+        "amount": -45.00,
+        "type": "debit",
+        "category": "Transportation"
+      },
+      {
+        "transaction_id": "TXN005",
+        "date": "2024-01-10",
+        "description": "Restaurant",
+        "amount": -67.80,
+        "type": "debit",
+        "category": "Dining"
+      }
+    ],
+    "CUST002": [
+      {
+        "transaction_id": "TXN006",
+        "date": "2024-01-15",
+        "description": "Online Transfer",
+        "amount": -200.00,
+        "type": "debit",
+        "category": "Transfer"
+      },
+      {
+        "transaction_id": "TXN007",
+        "date": "2024-01-14",
+        "description": "Freelance Payment",
+        "amount": 1500.00,
+        "type": "credit",
+        "category": "Income"
+      },
+      {
+        "transaction_id": "TXN008",
+        "date": "2024-01-12",
+        "description": "Electric Bill",
+        "amount": -120.00,
+        "type": "debit",
+        "category": "Utilities"
+      }
+    ],
+    "CUST003": [
+      {
+        "transaction_id": "TXN009",
+        "date": "2024-01-15",
+        "description": "Investment Dividend",
+        "amount": 500.00,
+        "type": "credit",
+        "category": "Investment"
+      },
+      {
+        "transaction_id": "TXN010",
+        "date": "2024-01-13",
+        "description": "Hotel Booking",
+        "amount": -350.00,
+        "type": "debit",
+        "category": "Travel"
+      }
+    ]
+  }
+}

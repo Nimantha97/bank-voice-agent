@@ -1,0 +1,18 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+
+# AI & LLM (Using Groq with OpenAI SDK)
+openai
+
+# Observability (Phase 4)
+langfuse
+
+# Utilities
+python-multipart
+aiofiles
+
+# Testing
+pytest
+pytest-asyncio
