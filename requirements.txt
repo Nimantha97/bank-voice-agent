@@ -16,3 +16,6 @@ aiofiles
 # Testing
 pytest
 pytest-asyncio
+
+# API documentation
+swagger-ui-bundle==0.0.9

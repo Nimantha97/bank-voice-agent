@@ -1,20 +1,11 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
 from app.agent import process_message
 from app.tools.banking import verify_identity
 import uuid
 
-app = FastAPI(title="Bank ABC Voice Agent")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter(prefix="/api/chat", tags=["Chat Agent"])
 
 class ChatRequest(BaseModel):
     message: str
@@ -31,12 +22,9 @@ class ChatResponse(BaseModel):
 # Session storage
 sessions = {}
 
-@app.get("/")
-def health():
-    return {"status": "ok", "service": "Bank ABC Voice Agent"}
-
-@app.post("/api/chat", response_model=ChatResponse)
+@router.post("/", response_model=ChatResponse)
 def chat(request: ChatRequest):
+    """Main chat endpoint with AI agent"""
     session_id = request.session_id or str(uuid.uuid4())
     
     # Initialize session
@@ -73,7 +61,3 @@ def chat(request: ChatRequest):
         requires_verification=result.get("requires_verification", False),
         flow=result.get("flow")
     )
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)

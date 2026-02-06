@@ -1,7 +1,7 @@
 """
 Quick test to verify API endpoints exist
 """
-from main import app
+from app.main import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
