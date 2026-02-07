@@ -2,7 +2,6 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.requests import Request
 
 from app.api import banking_router, chat_router
 
@@ -13,27 +12,17 @@ app = FastAPI(
     description="AI-powered banking assistant with 6 customer service flows",
     version="1.1.0",
     docs_url="/docs",
-
 )
 
+# CORS Configuration - MUST be before routers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,  # Must be False when using wildcard
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
-
-
-
-# Logging Middleware
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    """Log all incoming requests"""
-    logger.info(f"Request: {request.method} {request.url.path}")
-    response = await call_next(request)
-    logger.info(f"Response: {response.status_code}")
-    return response
 
 # Include routers
 app.include_router(banking_router)
