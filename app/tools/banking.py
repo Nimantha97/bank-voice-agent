@@ -38,23 +38,23 @@ def log_action(action: str, customer_id: str, details: Dict):
     AUDIT_LOG.append(log_entry)
     print(f"[AUDIT] {action} - Customer: {customer_id}")
 
-def verify_identity(customer_id: str, pin: str) -> bool:
+def verify_identity(customer_id: str, pin: str) -> Optional[Dict]:
     """
     CRITICAL: Verify customer identity before any sensitive operation
-    Returns True if credentials are valid, False otherwise
+    Returns customer object if credentials are valid, None otherwise
     """
     try:
         data = load_customers()
         for customer in data["customers"]:
             if customer["customer_id"] == customer_id and customer["pin"] == pin:
                 log_action("IDENTITY_VERIFIED", customer_id, {"success": True})
-                return True
+                return customer
         
         log_action("IDENTITY_VERIFICATION_FAILED", customer_id, {"success": False})
-        return False
+        return None
     except Exception as e:
         print(f"Error verifying identity: {e}")
-        return False
+        return None
 
 def get_account_balance(customer_id: str) -> Optional[Dict]:
     """
@@ -93,25 +93,27 @@ def get_recent_transactions(customer_id: str, count: int = 5) -> List[Dict]:
         print(f"Error getting transactions: {e}")
         return []
 
-def block_card(card_id: str, reason: str, customer_id: str) -> str:
+def block_card(card_id: str, reason: str) -> str:
     """
     IRREVERSIBLE ACTION: Block a card
     Returns confirmation message
+    
+    Note: This function requires customer_id to be derived from card_id
+    In production, card_id would be globally unique
     """
     try:
         data = load_customers()
         for customer in data["customers"]:
-            if customer["customer_id"] == customer_id:
-                for card in customer["cards"]:
-                    if card["card_id"] == card_id:
-                        card["status"] = "blocked"
-                        save_customers(data)
-                        log_action("CARD_BLOCKED", customer_id, {
-                            "card_id": card_id,
-                            "reason": reason,
-                            "card_number": card["card_number"]
-                        })
-                        return f"Card {card['card_number']} has been blocked successfully. Reason: {reason}"
+            for card in customer["cards"]:
+                if card["card_id"] == card_id:
+                    card["status"] = "blocked"
+                    save_customers(data)
+                    log_action("CARD_BLOCKED", customer["customer_id"], {
+                        "card_id": card_id,
+                        "reason": reason,
+                        "card_number": card["card_number"]
+                    })
+                    return f"Card {card['card_number']} has been blocked successfully. Reason: {reason}"
         
         return "Card not found"
     except Exception as e:

@@ -33,8 +33,17 @@ class UpdateAddressRequest(BaseModel):
 @router.post("/verify")
 def verify_customer(request: VerifyRequest):
     """Verify customer identity with ID and PIN"""
-    if verify_identity(request.customer_id, request.pin):
-        return {"success": True, "message": "Identity verified"}
+    customer = verify_identity(request.customer_id, request.pin)
+    if customer:
+        return {
+            "verified": True,
+            "customer": {
+                "customer_id": customer["customer_id"],
+                "name": customer["name"],
+                "account_number": customer["account_number"],
+                "balance": customer["account_balance"]
+            }
+        }
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @router.get("/balance/{customer_id}", response_model=BalanceResponse)
@@ -59,10 +68,10 @@ def get_cards(customer_id: str):
         raise HTTPException(status_code=404, detail="No cards found")
     return {"customer_id": customer_id, "cards": cards}
 
-@router.post("/cards/block/{customer_id}")
-def block_customer_card(customer_id: str, request: BlockCardRequest):
+@router.post("/block-card")
+def block_customer_card(request: BlockCardRequest):
     """Block a card (irreversible action)"""
-    result = block_card(request.card_id, request.reason, customer_id)
+    result = block_card(request.card_id, request.reason)
     if "Error" in result or "not found" in result:
         raise HTTPException(status_code=400, detail=result)
     return {"success": True, "message": result}

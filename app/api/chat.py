@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
     customer_id: Optional[str] = None
     pin: Optional[str] = None
     session_id: Optional[str] = None
+    verified: bool = False
 
 class ChatResponse(BaseModel):
     response: str
@@ -31,13 +32,19 @@ def chat(request: ChatRequest):
     if session_id not in sessions:
         sessions[session_id] = {"verified": False, "customer_id": None}
     
-    # Handle verification
+    # Update session from frontend if verified
+    if request.verified and request.customer_id:
+        sessions[session_id]["verified"] = True
+        sessions[session_id]["customer_id"] = request.customer_id
+    
+    # Handle verification with PIN
     if request.customer_id and request.pin:
-        if verify_identity(request.customer_id, request.pin):
+        customer = verify_identity(request.customer_id, request.pin)
+        if customer:
             sessions[session_id]["verified"] = True
             sessions[session_id]["customer_id"] = request.customer_id
             return ChatResponse(
-                response="Identity verified successfully. How can I help you today?",
+                response=f"Identity verified successfully, {customer['name']}. How can I help you today?",
                 session_id=session_id,
                 requires_verification=False
             )
