@@ -20,10 +20,21 @@ except Exception as e:
     print(f"⚠️ LangFuse not available: {e}")
     LANGFUSE_ENABLED = False
 
-client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
-)
+# Lazy initialization of OpenAI client
+_client = None
+
+def get_client():
+    """Get or create OpenAI client (lazy initialization)"""
+    global _client
+    if _client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY environment variable is not set")
+        _client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
+    return _client
 
 INTENT_SYSTEM_PROMPT = """You are a banking intent classifier. Analyze the user's message and classify it into ONE of these flows:
 
@@ -74,6 +85,7 @@ Respond with ONLY the flow name (e.g., "CARD_ATM_ISSUES"). No explanation."""
 
 def classify_intent(user_message: str) -> str:
     """Classify user intent into one of 6 banking flows"""
+    client = get_client()
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
