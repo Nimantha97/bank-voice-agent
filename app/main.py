@@ -1,11 +1,12 @@
-from datetime import time
-from venv import logger
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
 from app.api import banking_router, chat_router
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Bank ABC Voice Agent",
