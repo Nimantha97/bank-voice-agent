@@ -14,8 +14,8 @@ try:
         public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
         host=os.getenv("LANGFUSE_BASE_URL")
     )
-    LANGFUSE_ENABLED = True
-    print(" LangFuse initialized successfully")
+    LANGFUSE_ENABLED = False  # Temporarily disabled for debugging
+    print(" LangFuse disabled for debugging")
 except Exception as e:
     print(f" LangFuse not available: {e}")
     LANGFUSE_ENABLED = False
@@ -166,7 +166,7 @@ def handle_account_servicing(user_message: str, customer_id: Optional[str], veri
     """Handle account servicing requests"""
     from app.tools.banking import get_account_balance, get_recent_transactions
 
-    if not verified:
+    if not verified or not customer_id:
         return {
             "response": "I can help with account servicing. First, I need to verify your identity. Please provide your Customer ID and PIN.",
             "requires_verification": True,
@@ -176,6 +176,11 @@ def handle_account_servicing(user_message: str, customer_id: Optional[str], veri
     # Check for balance query
     if any(word in user_message.lower() for word in ["balance", "how much", "money", "account"]):
         balance_info = get_account_balance(customer_id)
+        if not balance_info:
+            return {
+                "response": "I couldn't retrieve your account information. Please try again.",
+                "flow": "ACCOUNT_SERVICING"
+            }
         return {
             "response": f"Your {balance_info['account_type']} account (#{balance_info['account_number']}) has a balance of ${balance_info['balance']:,.2f}",
             "flow": "ACCOUNT_SERVICING",
@@ -185,6 +190,11 @@ def handle_account_servicing(user_message: str, customer_id: Optional[str], veri
     # Check for transaction query
     if any(word in user_message.lower() for word in ["transaction", "statement", "history", "recent"]):
         transactions = get_recent_transactions(customer_id, 5)
+        if not transactions:
+            return {
+                "response": "No recent transactions found.",
+                "flow": "ACCOUNT_SERVICING"
+            }
         txn_list = "\n".join([f"- {t['date']}: {t['description']} (${t['amount']})" for t in transactions])
         return {
             "response": f"Here are your recent transactions:\n{txn_list}",
@@ -202,6 +212,11 @@ def handle_account_servicing(user_message: str, customer_id: Optional[str], veri
 
     # Default: show balance as most common query
     balance_info = get_account_balance(customer_id)
+    if not balance_info:
+        return {
+            "response": "I couldn't retrieve your account information. Please try again.",
+            "flow": "ACCOUNT_SERVICING"
+        }
     return {
         "response": f"Your {balance_info['account_type']} account (#{balance_info['account_number']}) has a balance of ${balance_info['balance']:,.2f}. I can also help with transaction history or profile updates.",
         "flow": "ACCOUNT_SERVICING",

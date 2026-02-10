@@ -68,7 +68,7 @@ async def transcribe_audio(audio: UploadFile = File(...)):
             language="en"
         )
         
-        logger.info(f"Transcribed: {transcription.text[:50]}...")
+        logger.info(f"[TRANSCRIBE] Full text: {transcription.text}")
         
         return TranscriptionResponse(
             text=transcription.text,
@@ -93,6 +93,8 @@ async def synthesize_speech(text: str = Form(...), voice: str = Form("autumn")):
         if len(text) > 4096:
             raise HTTPException(status_code=400, detail="Text too long (max 4096 chars)")
         
+        logger.info(f"[SYNTHESIZE] Request - Text: {text[:100]}... | Voice: {voice}")
+        
         client = get_voice_client()
         
         # Groq Orpheus requires specific voice format
@@ -106,7 +108,7 @@ async def synthesize_speech(text: str = Form(...), voice: str = Form("autumn")):
             response_format="wav"
         )
         
-        logger.info(f"Synthesized: {text[:50]}...")
+        logger.info(f"[SYNTHESIZE] Success - Audio size: {len(response.content)} bytes")
         
         return Response(
             content=response.content,
@@ -126,30 +128,39 @@ async def voice_chat(request: VoiceChatRequest):
     Voice-enabled chat
     
     Accepts text (from transcription) and returns text (for synthesis)
-    Uses Pydantic AI agent for processing
+    Uses standard agent (no pydantic-ai dependency)
     """
     try:
-        from app.agent.pydantic_agent import process_with_pydantic_ai
+        from app.agent import process_message
         import uuid
         
         session_id = request.session_id or str(uuid.uuid4())
         
-        result = await process_with_pydantic_ai(
+        logger.info(f"[VOICE CHAT] Message: {request.message} | Customer: {request.customer_id} | Verified: {request.verified}")
+        
+        result = process_message(
             request.message,
             request.customer_id,
-            request.verified,
-            session_id
+            request.verified
         )
         
+        if not result:
+            logger.error(f"[VOICE CHAT] Agent returned None for message: {request.message}")
+            raise HTTPException(status_code=500, detail="Agent returned no response")
+        
+        logger.info(f"[VOICE CHAT] Response: {result.get('response', 'NO RESPONSE')[:100]}... | Flow: {result.get('flow')}")
+        
         return VoiceChatResponse(
-            text_response=result["response"],
+            text_response=result.get("response", "I'm sorry, I couldn't process that."),
             session_id=session_id,
             requires_verification=result.get("requires_verification", False),
             flow=result.get("flow")
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Voice chat error: {e}")
+        logger.error(f"Voice chat error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Voice chat failed: {str(e)}")
 
 @router.get("/health")
