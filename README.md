@@ -235,16 +235,48 @@ Once the backend is running, visit:
 8. Type: "block CARD002"
 9. System blocks the card and confirms action
 
-### Viewing Traces in LangFuse
+### LangFuse Trace Evidence
 
-1. Go to https://cloud.langfuse.com
-2. Navigate to your project
-3. View traces for "banking-chat" sessions
-4. Inspect intent classification, tool calls, and responses
+The following traces demonstrate the AI agent's execution flow, including intent classification, tool calls, and response generation. Each trace provides full visibility into the system's decision-making process.
 
-Example traces to review:
-- Lost Card scenario (shows card blocking flow)
-- Balance Check scenario (shows verification and data retrieval)
+**Live Trace Links:**
+
+- **Balance Check**: [View Trace](https://cloud.langfuse.com/project/cmlbasbjr02htad07y2plt3do/traces/b922811043fa16a0f4433812e8c21d68?timestamp=2026-02-10T09%253A57%253A48.615Z)
+  - Demonstrates identity verification flow
+  - Shows get_account_balance tool execution
+  - Displays account information retrieval
+
+- **Recent Transactions**: [View Trace](https://cloud.langfuse.com/project/cmlbasbjr02htad07y2plt3do/traces/c46dc372ec02860a864c5f028ea8386f?timestamp=2026-02-09T04%253A52%253A15.526Z)
+  - Shows transaction history retrieval
+  - Demonstrates get_recent_transactions tool call
+  - Displays formatted transaction list
+
+- **Lost Credit Card**: [View Trace](https://cloud.langfuse.com/project/cmlbasbjr02htad07y2plt3do/traces/a93b406449ffdc764f1af04152f0be87?timestamp=2026-02-10T09%253A58%253A11.587Z)
+  - Shows intent classification for card issues
+  - Demonstrates get_customer_cards tool execution
+  - Displays card listing and selection flow
+
+- **Block Card (CARD002)**: [View Trace](https://cloud.langfuse.com/project/cmlbasbjr02htad07y2plt3do/traces/b09eee5815e3d618909785c1c52322c0?timestamp=2026-02-10T09%253A58%253A27.370Z)
+  - Shows complete card blocking workflow
+  - Demonstrates block_card tool execution
+  - Displays confirmation and audit logging
+
+**Trace Screenshots:**
+
+For quick reference without requiring LangFuse access, screenshots of key traces are available in the `/documents` folder:
+
+- `langfuse-trace-balance-check.png` - Balance inquiry with verification
+- `langfuse-trace-lost-card.png` - Lost card reporting flow
+- `langfuse-trace-block-card.png` - Card blocking execution
+- `langfuse-trace-transactions.png` - Transaction history retrieval
+
+Each trace includes:
+- User input message
+- Intent classification result
+- Tool/function calls with parameters
+- Execution timing and performance metrics
+- Final response output
+- Error handling (if applicable)
 
 ## Project Structure
 
