@@ -2,6 +2,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import banking_router, chat_router
 
@@ -23,6 +24,30 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+# Health check endpoint
+@app.get("/health")
+def health_check():
+    """Health check endpoint for monitoring"""
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "healthy",
+            "service": "bank-voice-agent",
+            "version": "1.1.0"
+        }
+    )
+
+@app.get("/")
+def root():
+    """Root endpoint with API information"""
+    return {
+        "service": "Bank ABC Voice Agent",
+        "version": "1.1.0",
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health"
+    }
 
 # Include routers
 app.include_router(banking_router)

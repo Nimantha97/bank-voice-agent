@@ -6,6 +6,16 @@ A full-stack conversational AI platform for banking customer service, featuring 
 
 This project demonstrates an autonomous AI agent capable of handling complex banking conversations across 6 customer service flows. The platform enforces mandatory identity verification before sensitive operations and provides full traceability through LangFuse integration.
 
+**Project Scope**: This is a Proof of Concept (POC) implementation focused on demonstrating:
+- AI agent architecture and intent classification
+- Multi-flow conversation handling
+- Security patterns (identity verification, rate limiting)
+- Observability and tracing infrastructure
+- Full-stack integration (React frontend + FastAPI backend)
+- Production deployment capabilities
+
+The POC uses JSON mock data to prioritize rapid development and easy testing. The architecture is designed with clear separation of concerns, allowing straightforward migration to production-grade databases without affecting business logic.
+
 ## Live Demo
 
 **Frontend**: https://bank-voice-agent-fe.vercel.app/   
@@ -149,11 +159,11 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `.env` and add your API keys:
+Edit `.env` and add related API keys:
 ```
-GROQ_API_KEY=your_groq_api_key
-LANGFUSE_SECRET_KEY=your_langfuse_secret_key
-LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
+GROQ_API_KEY=ygroq_api_key
+LANGFUSE_SECRET_KEY=langfuse_secret_key
+LANGFUSE_PUBLIC_KEY=langfuse_public_key
 LANGFUSE_BASE_URL=https://cloud.langfuse.com
 ENVIRONMENT=development
 ```
@@ -199,6 +209,9 @@ Frontend will be available at: http://localhost:5173
 Once the backend is running, visit:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+- Health Check: http://localhost:8000/health
+
+For detailed API examples with curl commands, see [API Examples](documents/API_EXAMPLES.md).
 
 ### Key Endpoints
 
@@ -220,7 +233,18 @@ Once the backend is running, visit:
 }
 ```
 
+**GET /health**
+```json
+{
+  "status": "healthy",
+  "service": "bank-voice-agent",
+  "version": "1.1.0"
+}
+```
+
 ## Testing the Application
+
+For comprehensive testing instructions, see [Testing Guide](documents/TESTING_GUIDE.md).
 
 ### End-to-End Test Scenario
 
@@ -306,11 +330,35 @@ bank-voice-agent/
 
 ## Design Decisions and Trade-offs
 
-### 1. Mock Data vs Real Database
-**Decision**: Used JSON files for data storage  
-**Rationale**: Faster POC development, easier to seed test data  
-**Trade-off**: Not production-ready, no concurrent access handling  
-**Future**: Migrate to PostgreSQL or MongoDB for production
+### 1. Data Layer: JSON Mock Data vs Database
+**Decision**: Used JSON files for data storage in this POC  
+**Rationale**:  
+- Faster POC development and iteration cycles
+- Zero infrastructure dependencies for reviewers to test locally
+- Simplified deployment without database provisioning
+- Easier to seed consistent test data across environments
+- Demonstrates business logic and AI integration without database complexity
+
+**Trade-off**: Not suitable for production use due to:
+- No concurrent access handling or transaction support
+- No data persistence across server restarts
+- Limited scalability and query performance
+- No relational integrity constraints
+
+**Production Migration Path**:  
+The current architecture uses a repository pattern that abstracts data access through `app/tools/banking.py`. This design allows for straightforward migration to a real database:
+```python
+# Current: JSON file access
+def get_customer(customer_id: str):
+    with open('data/customers.json') as f:
+        customers = json.load(f)
+    return customers.get(customer_id)
+
+# Future: Database access (same interface)
+def get_customer(customer_id: str):
+    return db.query(Customer).filter_by(id=customer_id).first()
+```
+Recommended production stack: PostgreSQL with SQLAlchemy ORM, maintaining the same function signatures to minimize code changes.
 
 ### 2. Groq API vs Anthropic Claude
 **Decision**: Used Groq API with Llama model  
@@ -362,10 +410,10 @@ bank-voice-agent/
 
 1. **Mock Data**: Using JSON files instead of a real database
 2. **Partial Implementation**: Only 2 of 6 flows have full business logic
-3. **No Voice**: Text-based chat only (voice features planned)
+3. **Text-Only Interface**: Voice input/output not implemented in this POC
 4. **Session Persistence**: In-memory sessions (lost on restart)
-5. **No Multi-turn Context**: Agent doesn't maintain conversation history
-6. **Simple NLP**: Keyword matching instead of advanced NLU
+5. **Limited Context**: Agent doesn't maintain multi-turn conversation history
+6. **Keyword-Based Routing**: Uses pattern matching instead of LLM-based tool selection
 
 ## Deployment
 
@@ -399,20 +447,31 @@ bank-voice-agent/
 
 ### Health Checks
 - Backend: https://bank-voice-agent-production.up.railway.app/docs
-- Frontend: https://your-frontend.vercel.app
+- Frontend: https://bank-voice-agent-fe.vercel.app/
 
 ## Future Enhancements
 
-1. Implement remaining 4 flows with full business logic
-2. Add voice input/output using Web Speech API
-3. Implement conversation history and context
-4. Add LLM-based tool selection
-5. Migrate to production database
-6. Add comprehensive test suite
-7. Implement advanced security features
-8. Add analytics dashboard
-9. Support multiple languages
-10. Add file upload for documents
+### High Priority
+1. **Voice Interface**: Integrate Groq's Whisper (speech-to-text) and Orpheus (text-to-speech) APIs for voice banking
+   - Whisper Large V3 Turbo for fast multilingual transcription
+   - Canopy Labs Orpheus for natural voice responses
+   - WebRTC for real-time audio streaming
+
+2. **Conversation Memory**: Implement multi-turn dialogue context using LangChain memory or custom session storage
+
+3. **LLM-Based Tool Selection**: Replace keyword matching with Groq function calling for more accurate intent-to-action mapping
+
+4. **Complete Flow Implementation**: Add full business logic for remaining 4 flows (Account Opening, Digital Support, Transfers, Closure)
+
+### Medium Priority
+5. **Database Migration**: Move from JSON to PostgreSQL with SQLAlchemy ORM
+6. **Advanced Security**: Add JWT authentication, refresh tokens, and IP-based rate limiting
+7. **Comprehensive Testing**: Unit tests, integration tests, and E2E test suite
+8. **Analytics Dashboard**: Real-time metrics for call volume, intent distribution, and resolution rates
+
+### Low Priority
+9. **Multi-language Support**: Extend beyond English using Whisper's multilingual capabilities
+10. **Document Upload**: Allow customers to submit documents for account opening
 
 ## Contributing
 
