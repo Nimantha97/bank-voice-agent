@@ -550,26 +550,6 @@ Recommended production stack: PostgreSQL with SQLAlchemy ORM, maintaining the sa
 
 ### Health Checks
 - Backend: https://bank-voice-agent-production.up.railway.app/docs
-- Frontend: https://bank-voice-agent-fe.vercel.app/
-
-## Future Enhancements
-
-### High Priority
-1. **Conversation Memory**: Implement multi-turn dialogue context using LangChain memory or custom session storage
-
-3. **LLM-Based Tool Selection**: Replace keyword matching with Groq function calling for more accurate intent-to-action mapping
-
-4. **Complete Flow Implementation**: Add full business logic for remaining 4 flows (Account Opening, Digital Support, Transfers, Closure)
-
-### Medium Priority
-5. **Database Migration**: Move from JSON to PostgreSQL with SQLAlchemy ORM
-6. **Advanced Security**: Add JWT authentication, refresh tokens, and IP-based rate limiting
-7. **Comprehensive Testing**: Unit tests, integration tests, and E2E test suite
-8. **Analytics Dashboard**: Real-time metrics for call volume, intent distribution, and resolution rates
-
-### Low Priority
-9. **Multi-language Support**: Extend beyond English using Whisper's multilingual capabilities
-10. **Document Upload**: Allow customers to submit documents for account opening
 
 ## Contributing
 
@@ -580,9 +560,6 @@ This is a POC project. For production deployment, consider:
 - Scalability improvements
 - Compliance requirements (PCI-DSS, GDPR, etc.)
 
-## License
-
-MIT License
 
 ## Support
 
