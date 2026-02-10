@@ -89,6 +89,7 @@ Cards: 2 (CARD001 - Credit/Blocked, CARD002 - Debit/Active)
 ### Backend
 - **Framework**: FastAPI (Python)
 - **AI/LLM**: Groq API (llama-3.3-70b-versatile)
+- **Voice AI**: Groq Whisper (STT) + Orpheus (TTS)
 - **Observability**: LangFuse
 - **Deployment**: Railway.app
 - **Database**: JSON mock data (for POC)
@@ -215,7 +216,12 @@ For detailed API examples with curl commands, see [API Examples](documents/API_E
 
 ### Key Endpoints
 
+#### Text Chat Endpoints
+
 **POST /api/chat/**
+
+Text-based conversational interface. Processes text messages through the AI agent and returns text responses.
+
 ```json
 {
   "message": "what is my balance",
@@ -224,6 +230,79 @@ For detailed API examples with curl commands, see [API Examples](documents/API_E
   "verified": true
 }
 ```
+
+#### Voice AI Endpoints
+
+**POST /api/voice/transcribe**
+
+Converts audio to text using Groq Whisper. Upload audio file (WAV, MP3, M4A) and receive transcribed text.
+
+```bash
+curl -X POST "http://localhost:8000/api/voice/transcribe" \
+  -F "audio=@recording.wav"
+```
+
+Response:
+```json
+{
+  "text": "what is my account balance",
+  "language": "en"
+}
+```
+
+**POST /api/voice/synthesize**
+
+Converts text to speech using Groq Orpheus. Returns audio file (WAV format).
+
+```bash
+curl -X POST "http://localhost:8000/api/voice/synthesize" \
+  -F "text=Your balance is fifteen thousand dollars" \
+  -F "voice=autumn" \
+  --output response.wav
+```
+
+Available voices: `autumn`, `diana`, `hannah`, `austin`, `daniel`, `troy`
+
+**POST /api/voice/chat**
+
+Voice-enabled chat interface. Accepts text input (typically from transcription) and returns text output (for synthesis). Uses the same AI agent logic as /api/chat but optimized for voice workflows.
+
+```json
+{
+  "message": "what is my balance",
+  "customer_id": "CUST001",
+  "verified": true,
+  "session_id": "unique-session-id"
+}
+```
+
+Response:
+```json
+{
+  "text_response": "Your Savings account has a balance of $15,420.50",
+  "session_id": "unique-session-id",
+  "requires_verification": false,
+  "flow": "account_servicing"
+}
+```
+
+**GET /api/voice/health**
+
+Voice AI service health check.
+
+```json
+{
+  "status": "healthy",
+  "service": "voice-ai",
+  "features": {
+    "speech_to_text": "whisper-large-v3-turbo",
+    "text_to_speech": "canopylabs/orpheus-v1-english",
+    "voice_chat": "enabled"
+  }
+}
+```
+
+#### Authentication Endpoints
 
 **POST /api/banking/verify**
 ```json
@@ -241,6 +320,30 @@ For detailed API examples with curl commands, see [API Examples](documents/API_E
   "version": "1.1.0"
 }
 ```
+
+### Chat vs Voice Endpoints
+
+The platform provides two parallel interfaces for the same banking agent:
+
+**Text Chat (/api/chat)**
+- Direct text input and output
+- Designed for web chat interfaces, messaging apps, or API integrations
+- Single endpoint handles the complete conversation flow
+- Returns formatted text responses ready for display
+
+**Voice AI (/api/voice/\*)**
+- Three-step workflow: transcribe audio, process through agent, synthesize response
+- Designed for voice-based interfaces like phone systems or voice assistants
+- Modular endpoints allow flexible integration (use transcription only, synthesis only, or full pipeline)
+- /api/voice/chat uses the same agent logic as /api/chat but returns responses optimized for text-to-speech conversion
+
+Both interfaces share the same:
+- AI agent and intent classification logic
+- Banking tools and business logic
+- Security and verification requirements
+- Session management and audit logging
+
+The separation allows clients to choose the appropriate interface without duplicating backend logic.
 
 ## Testing the Application
 
@@ -316,7 +419,8 @@ bank-voice-agent/
 │   │   └── schemas.py       # Pydantic models
 │   └── api/
 │       ├── banking.py       # Banking REST endpoints
-│       └── chat.py          # Chat endpoint
+│       ├── chat.py          # Text chat endpoint
+│       └── voice.py         # Voice AI endpoints (STT/TTS/chat)
 ├── data/
 │   ├── customers.json       # Mock customer data
 │   └── transactions.json    # Mock transaction data
@@ -410,10 +514,9 @@ Recommended production stack: PostgreSQL with SQLAlchemy ORM, maintaining the sa
 
 1. **Mock Data**: Using JSON files instead of a real database
 2. **Partial Implementation**: Only 2 of 6 flows have full business logic
-3. **Text-Only Interface**: Voice input/output not implemented in this POC
-4. **Session Persistence**: In-memory sessions (lost on restart)
-5. **Limited Context**: Agent doesn't maintain multi-turn conversation history
-6. **Keyword-Based Routing**: Uses pattern matching instead of LLM-based tool selection
+3. **Session Persistence**: In-memory sessions (lost on restart)
+4. **Limited Context**: Agent doesn't maintain multi-turn conversation history
+5. **Keyword-Based Routing**: Uses pattern matching instead of LLM-based tool selection
 
 ## Deployment
 
@@ -452,12 +555,7 @@ Recommended production stack: PostgreSQL with SQLAlchemy ORM, maintaining the sa
 ## Future Enhancements
 
 ### High Priority
-1. **Voice Interface**: Integrate Groq's Whisper (speech-to-text) and Orpheus (text-to-speech) APIs for voice banking
-   - Whisper Large V3 Turbo for fast multilingual transcription
-   - Canopy Labs Orpheus for natural voice responses
-   - WebRTC for real-time audio streaming
-
-2. **Conversation Memory**: Implement multi-turn dialogue context using LangChain memory or custom session storage
+1. **Conversation Memory**: Implement multi-turn dialogue context using LangChain memory or custom session storage
 
 3. **LLM-Based Tool Selection**: Replace keyword matching with Groq function calling for more accurate intent-to-action mapping
 

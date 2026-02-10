@@ -53,6 +53,10 @@ def root():
 app.include_router(banking_router)
 app.include_router(chat_router)
 
+# Voice AI Module (NEW - ISOLATED)
+from app.api.voice import router as voice_router
+app.include_router(voice_router)
+
 
 if __name__ == "__main__":
     import uvicorn
