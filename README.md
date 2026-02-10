@@ -8,9 +8,8 @@ This project demonstrates an autonomous AI agent capable of handling complex ban
 
 ## Live Demo
 
-**Frontend**: https://bank-voice-agent-fe.vercel.app/  
-**Backend API**: https://bank-voice-agent-production.up.railway.app  
-**API Documentation**: https://bank-voice-agent-production.up.railway.app/docs  
+**Frontend**: https://bank-voice-agent-fe.vercel.app/   
+**Backend API Documentation**: https://bank-voice-agent-production.up.railway.app/docs  
 **LangFuse Traces**: https://cloud.langfuse.com
 
 ## Test Credentials
