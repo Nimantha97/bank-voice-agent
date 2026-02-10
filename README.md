@@ -345,9 +345,6 @@ Both interfaces share the same:
 
 The separation allows clients to choose the appropriate interface without duplicating backend logic.
 
-## Testing the Application
-
-For comprehensive testing instructions, see [Testing Guide](documents/TESTING_GUIDE.md).
 
 ### End-to-End Test Scenario
 
