@@ -15,9 +15,9 @@ try:
         host=os.getenv("LANGFUSE_BASE_URL")
     )
     LANGFUSE_ENABLED = True
-    print("✅ LangFuse initialized successfully")
+    print(" LangFuse initialized successfully")
 except Exception as e:
-    print(f"⚠️ LangFuse not available: {e}")
+    print(f" LangFuse not available: {e}")
     LANGFUSE_ENABLED = False
 
 # Lazy initialization of OpenAI client
@@ -235,32 +235,32 @@ def handle_help_and_faq(user_message: str) -> Optional[Dict]:
         return {
             "response": """I'm your Bank ABC AI Assistant! Here's what I can help you with:
 
-🏦 **Account Services**
+ **Account Services**
 • Check account balance
 • View recent transactions
 • Update your address or profile
 
-💳 **Card & ATM Issues**
+ **Card & ATM Issues**
 • Report lost or stolen cards
 • Block cards immediately
 • Report ATM problems
 • Handle declined payments
 
-📱 **Digital Banking Support**
+ **Digital Banking Support**
 • Login issues
 • OTP/verification problems
 • App crashes or errors
 
-💸 **Transfers & Payments**
+ **Transfers & Payments**
 • Money transfers
 • Bill payments
 • Beneficiary management
 
-🆕 **Account Opening**
+ **Account Opening**
 • New account inquiries
 • Document requirements
 
-❌ **Account Closure**
+ **Account Closure**
 • Close account requests
 
 Just tell me what you need! For security, I'll verify your identity before accessing account information.

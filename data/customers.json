@@ -23,7 +23,7 @@
           "card_id": "CARD002",
           "card_number": "**** **** **** 5678",
           "card_type": "Debit",
-          "status": "active"
+          "status": "blocked"
         }
       ]
     },
