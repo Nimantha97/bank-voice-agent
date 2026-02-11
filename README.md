@@ -18,7 +18,7 @@ The POC uses JSON mock data to prioritize rapid development and easy testing. Th
 
 ## Live Demo
 
-**Frontend**: https://bank-voice-agent-fe.vercel.app/   
+**Frontend**: https://bank-voice-agent-fe-oqa1.vercel.app/   
 **Backend API Documentation**: https://bank-voice-agent-production.up.railway.app/docs  
 **LangFuse Traces**: https://cloud.langfuse.com
 
